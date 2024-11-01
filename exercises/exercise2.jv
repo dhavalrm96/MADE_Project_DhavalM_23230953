@@ -3,7 +3,6 @@ pipeline treesPipeline {
         -> treesTextFileInterpreter
         -> treesCSVInterpreter
         -> treesTableInterpreter
-        -> DataCleaner
         -> DatabaseLoader;
 
     block DataExtractor oftype HttpExtractor {
@@ -20,23 +19,12 @@ pipeline treesPipeline {
         header: true;
         columns: [
             "lfd_nr" oftype integer,
-            "id" oftype text constraint {
-                pattern: "^\\d{1,3}\\.\\d+, \\d{1,3}\\.\\d+$";  // Ensure geo-coordinates format
-            },
-            "stadtteil" oftype text constraint {
-                pattern: "^Vogelsang.*";  // Keep only entries starting with "Vogelsang"
-            },
+            "id" oftype text,
+            "stadtteil" oftype text,
             "standort" oftype text,
             "baumart_botanisch" oftype text,
-            "baumfamilie" oftype text,
-            "pflanzjahr" oftype integer constraint {
-                min: 1900;  // Example year validation
-            }
+            "baumfamilie" oftype text
         ];
-    }
-
-    block DataCleaner oftype ColumnRemover {
-        columns: ["baumart_deutsch"];  // Drop the column
     }
 
     block DatabaseLoader oftype SQLiteLoader {
