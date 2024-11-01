@@ -3,18 +3,16 @@ pipeline treesPipeline {
         -> treesTextFileInterpreter
         -> treesCSVInterpreter
         -> treesTableInterpreter
-        -> DataFilter
-        -> ColumnDropper
-        -> PatternValidator
+        -> DataCleaner
         -> DatabaseLoader;
 
-    block DataExtractor oftype HttpExtractor { 
-        url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv"; 
+    block DataExtractor oftype HttpExtractor {
+        url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";
     }
 
     block treesTextFileInterpreter oftype TextFileInterpreter {}
 
-    block treesCSVInterpreter oftype CSVInterpreter { 
+    block treesCSVInterpreter oftype CSVInterpreter {
         delimiter: ";";
     }
 
@@ -22,30 +20,27 @@ pipeline treesPipeline {
         header: true;
         columns: [
             "lfd_nr" oftype integer,
-            "id" oftype text,  // Adjust for geo-coordinate validation
-            "stadtteil" oftype text,
+            "id" oftype text constraint {
+                pattern: "^\\d{1,3}\\.\\d+, \\d{1,3}\\.\\d+$";  // Ensure geo-coordinates format
+            },
+            "stadtteil" oftype text constraint {
+                pattern: "^Vogelsang.*";  // Keep only entries starting with "Vogelsang"
+            },
             "standort" oftype text,
             "baumart_botanisch" oftype text,
             "baumfamilie" oftype text,
-            "pflanzjahr" oftype integer
+            "pflanzjahr" oftype integer constraint {
+                min: 1900;  // Example year validation
+            }
         ];
     }
 
-    block DataFilter oftype RowFilter {
-        filter: "stadtteil LIKE 'Vogelsang%'";
+    block DataCleaner oftype ColumnRemover {
+        columns: ["baumart_deutsch"];  // Drop the column
     }
 
-    block ColumnDropper oftype ColumnRemover {
-        columns: ["baumart_deutsch"];
-    }
-
-    block PatternValidator oftype PatternMatcher {
-        column: "id";
-        pattern: "^\\d{1,3}\\.\\d+, \\d{1,3}\\.\\d+$";
-    }
-
-    block DatabaseLoader oftype SQLiteLoader { 
-        table: "trees"; 
-        file: "./trees.sqlite"; 
+    block DatabaseLoader oftype SQLiteLoader {
+        table: "trees";
+        file: "./trees.sqlite";
     }
 }
