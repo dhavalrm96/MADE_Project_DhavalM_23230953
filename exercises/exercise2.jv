@@ -2,6 +2,7 @@ pipeline treesPipeline {
     DataExtractor
         -> treesTextFileInterpreter
         -> treesCSVInterpreter
+        -> DataFilter
         -> treesTableInterpreter
         -> DatabaseLoader;
 
@@ -26,6 +27,11 @@ pipeline treesPipeline {
             "baumfamilie" oftype text
         ];
     }
+
+    block DataFilter oftype RowFilter {
+        filter: "stadtteil LIKE 'Vogelsang%'";  
+    }
+
 
     block DatabaseLoader oftype SQLiteLoader {
         table: "trees";
