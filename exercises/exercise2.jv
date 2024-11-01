@@ -2,7 +2,6 @@ pipeline treesPipeline {
     DataExtractor
         -> treesTextFileInterpreter
         -> treesCSVInterpreter
-        -> DataFilter
         -> treesTableInterpreter
         -> DatabaseLoader;
 
@@ -26,10 +25,6 @@ pipeline treesPipeline {
             "baumart_botanisch" oftype text,
             "baumfamilie" oftype text
         ];
-    }
-
-    block DataFilter oftype RowFilter {
-        filter: "stadtteil LIKE 'Vogelsang%'";  
     }
 
 
