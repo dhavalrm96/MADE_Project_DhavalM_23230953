@@ -6,7 +6,7 @@ pipeline treesPipeline {
         -> DatabaseLoader;
 
     block DataExtractor oftype HttpExtractor {
-        url: "https://www.govdata.de/web/guest/suchen/-/details/stadt-neuss-baumpflanzungen-2023";
+        url: "https://opendata.rhein-kreis-neuss.de/api/v2/catalog/datasets/stadt-neuss-herbstpflanzung-2023/exports/csv";
     }
 
     block treesTextFileInterpreter oftype TextFileInterpreter {}
