@@ -1,0 +1,35 @@
+pipeline treesPipeline {
+    DataExtractor
+        -> treesTextFileInterpreter
+        -> treesCSVInterpreter
+        -> treesTableInterpreter
+        -> DatabaseLoader;
+
+    block DataExtractor oftype HttpExtractor {
+        url: "https://www.govdata.de/web/guest/suchen/-/details/stadt-neuss-baumpflanzungen-2023";
+    }
+
+    block treesTextFileInterpreter oftype TextFileInterpreter {}
+
+    block treesCSVInterpreter oftype CSVInterpreter {
+        delimiter: ";";
+    }
+
+    block treesTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "lfd_nr" oftype integer,
+            "id" oftype text,
+            "stadtteil" oftype text,
+            "standort" oftype text,
+            "baumart_botanisch" oftype text,
+            "baumfamilie" oftype text
+        ];
+    }
+
+
+    block DatabaseLoader oftype SQLiteLoader {
+        table: "trees";
+        file: "./trees.sqlite";
+    }
+} 
