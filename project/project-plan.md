@@ -1,30 +1,30 @@
 # Project Plan
 
-## Title
-Heart Attack Risk Prediction and Analysis Using Patient Health Data
+## Project Title
+CardioCare: Predictive Modeling for Cardiovascular Disease Risk
 
 ## Main Question
-What are the key health and lifestyle factors that contribute to the risk of heart attacks?
+What are the key health and lifestyle factors that contribute to the risk of cardiovascular disease?
 
 ## Description
-This study aims to develop a predictive model to assess the risk of heart attacks using comprehensive patient health data. By analyzing various factors such as age, BMI, chronic conditions, lifestyle choices, and medical history, the project seeks to identify which variables most significantly contribute to heart attack risk. Understanding these relationships is crucial for preventive healthcare, personalized patient interventions, and public health strategies. The ultimate goal is to provide insights that can help healthcare providers take preemptive measures to reduce heart attack incidences.
+This project aims to develop a predictive model to assess the risk of cardiovascular disease (CVD) using comprehensive patient health data. By analyzing various factors such as age, blood pressure, cholesterol levels, chest pain type, and other health indicators, the study seeks to identify which variables most significantly contribute to cardiovascular disease risk. Understanding these relationships is crucial for preventive healthcare, personalized patient interventions, and public health strategies. The ultimate goal is to provide insights that help healthcare providers implement early interventions to reduce the incidence of cardiovascular disease.
 
 ## Datasources:
-### Datasource 1: Patient Health and Medical History Data:
-* URL: https://www.kaggle.com/datasets/tarekmuhammed/patients-data-for-medical-field
+### Datasource 1: Patient Cardiovascular Health Data
+* URL: https://data.mendeley.com/datasets/dzz48mvjht/1
+* Data link: https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/dzz48mvjht-1.zip
 * Data Type: CSV
-* Description:  Contains patient demographics, medical history (e.g., chronic diseases, smoking status), health conditions, and test results.
+
   
-### Datasource 2: 
+ 
 
 ## Work Packages
 <!-- List of work packages ordered sequentially-->
-1.Preparation: Define objectives, stakeholders, and choose analysis tools.
-2.Data Collection: Load and preprocess data; handle missing values and encode features.
+1.Preparation
+2.Data Collection
 3.EDA: Visualize data and identify patterns with various plots.
-4.Feature Engineering: Select and create relevant features.
-5.Model Development: Train predictive models and optimize hyperparameters.
-6.Evaluation and Validation: Validate models using metrics like accuracy, precision, and AUC-ROC.
-7.Strategies Proposal: Recommend early intervention strategies for healthcare.
-8.Reporting: Summarize findings with visuals and actionable insights.
+4.Feature Engineering
+5.Model Development
+6.Evaluation and Validation
+8.Reporting
 
