@@ -26,5 +26,5 @@ This project aims to develop a predictive model to assess the risk of cardiovasc
 4.Feature Engineering
 5.Model Development
 6.Evaluation and Validation
-8.Reporting
+7.Reporting
 
