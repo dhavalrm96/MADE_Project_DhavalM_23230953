@@ -19,6 +19,7 @@ This project aims to develop a predictive model to assess the risk of cardiovasc
  
 
 ## Work Packages
+<!-- List of work packages ordered sequentially, each pointing to an issue with more details. -->
 
 1.Preparation
 2.Data Collection
