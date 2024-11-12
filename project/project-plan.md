@@ -20,7 +20,6 @@ This project aims to develop a predictive model to assess the risk of cardiovasc
 
 ## Work Packages
 <!-- List of Work Packages ordered sequentially. -->
-
 1.Preparation
 2.Data Collection
 3.EDA: Visualize data and identify patterns with various plots.
