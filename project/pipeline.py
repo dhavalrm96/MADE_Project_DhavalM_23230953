@@ -5,7 +5,7 @@ import sqlite3
 import pandas as pd
 
 
-DATA_DIR = './data'  
+DATA_DIR = '../data'  
 ZIP_FILE_PATH = os.path.join(DATA_DIR, 'dataset.zip')
 DB_PATH = os.path.join(DATA_DIR, 'data.sqlite')  
 DATA_URL = 'https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/dzz48mvjht-1.zip'
