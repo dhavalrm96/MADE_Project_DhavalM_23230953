@@ -1,0 +1,89 @@
+pipeline CountryStatsPipeline {
+
+    // Bond Issuance Flow
+    DataExtractor_Bond
+        -> CountryStatsXLSXInterpreter_Bond
+        -> CountryStatsSheetPicker_Bond
+        -> CountryStatsRangeSelector_Bond
+        -> bondIssuanceTableInterpreter
+        -> bondIssuanceLoader;
+
+    // GDP Per Capita Flow
+    DataExtractor_GDP
+        -> CountryStatsXLSXInterpreter_GDP
+        -> CountryStatsSheetPicker_GDP
+        -> CountryStatsRangeSelector_GDP
+        -> gdpPerCapitaTableInterpreter
+        -> gdpPerCapitaLoader;
+
+    // Block 1: Extract data for Bond Issuance Flow
+    block DataExtractor_Bond oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+    }
+
+    // Block 1: Extract data for GDP Per Capita Flow
+    block DataExtractor_GDP oftype HttpExtractor {
+        url: "https://thedocs.worldbank.org/en/doc/7d852628d96b9411d43e5d36d5dff941-0050062022/original/Graphs-Chapter-5-02082022.xlsx";
+    }
+
+    // Block 2: Interpret the file as an Excel workbook (for Bond Issuance)
+    block CountryStatsXLSXInterpreter_Bond oftype XLSXInterpreter {}
+
+    // Block 2: Interpret the file as an Excel workbook (for GDP Per Capita)
+    block CountryStatsXLSXInterpreter_GDP oftype XLSXInterpreter {}
+
+    // Block 3: Select the sheet for Bond Issuance
+    block CountryStatsSheetPicker_Bond oftype SheetPicker {
+        sheetName: "Figure S5.1.2";
+    }
+
+    // Block 3: Select the sheet for GDP Per Capita
+    block CountryStatsSheetPicker_GDP oftype SheetPicker {
+        sheetName: "Figure S5.1.2";
+    }
+
+    // Block 4: Select the range for Bond Issuance
+    block CountryStatsRangeSelector_Bond oftype CellRangeSelector {
+        select: range P2:S45;
+    }
+
+    // Block 4: Select the range for GDP Per Capita
+    block CountryStatsRangeSelector_GDP oftype CellRangeSelector {
+        select: range P2:S45;
+    }
+
+    
+
+    // Block 6: Interpret the table for Bond Issuance
+    block bondIssuanceTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "ISO3" oftype CountryCodeAlpha3,
+            "Share of government sustainable bonds" oftype decimal
+        ];
+    }
+
+    // Block 6: Interpret the table for GDP Per Capita
+    block gdpPerCapitaTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
+            "ISO3" oftype CountryCodeAlpha3,
+            "GDP per capita (US$, thousands)" oftype decimal
+        ];
+    }
+
+    // Block 7: Load Bond Issuance data into SQLite
+    block bondIssuanceLoader oftype SQLiteLoader {
+    table: "bondIssuance";
+    file: "./country-stats.sqlite";
+    dropTable: false;
+    
+    }
+
+    block gdpPerCapitaLoader oftype SQLiteLoader {
+    table: "gdpPerCapita";
+    file: "./country-stats.sqlite";
+    dropTable: false;
+    
+    }
+}
