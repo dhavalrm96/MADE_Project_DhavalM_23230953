@@ -1,65 +1,118 @@
 import os
-import requests
 import zipfile
-import sqlite3
 import pandas as pd
+import sqlite3
+from kaggle.api.kaggle_api_extended import KaggleApi
+import requests
 
-
-DATA_DIR = '../data'  
-ZIP_FILE_PATH = os.path.join(DATA_DIR, 'dataset.zip')
-DB_PATH = os.path.join(DATA_DIR, 'data.sqlite')  
-DATA_URL = 'https://prod-dcd-datasets-cache-zipfiles.s3.eu-west-1.amazonaws.com/dzz48mvjht-1.zip'
-
+DATA_DIR = "C:/Users/mulan/OneDrive/Desktop/MADE/MADE_Project_DhavalM_23230953/data"
+DB_FILE = os.path.join(DATA_DIR, "data.db")
+KAGGLE_DATASET = "microize/newyork-yellow-taxi-trip-data-2020-2019"
+DATA_ZIP_FILE = os.path.join(DATA_DIR, "newyork_taxi_data.zip")
+WEATHER_DATA_URL = "https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/retrievebulkdataset?&key=EWKX6KNV5Q2BQAP4XU4KATLT8&taskId=6121779de1626d8757e8255faf6e524e&zip=false"
+WEATHER_FILE = os.path.join(DATA_DIR, "weather_data.csv")
+REQUIRED_FILES = [
+    "yellow_tripdata_2020-01.csv",
+    "yellow_tripdata_2020-02.csv",
+    "yellow_tripdata_2020-03.csv",
+    "yellow_tripdata_2020-04.csv",
+    "yellow_tripdata_2020-05.csv",
+    "yellow_tripdata_2020-06.csv",
+]
 
 os.makedirs(DATA_DIR, exist_ok=True)
 
+def download_kaggle_dataset(dataset, output_dir):
+    print(f"Downloading Kaggle dataset: {dataset}")
+    api = KaggleApi()
+    api.authenticate()
+    # Download the dataset as a zip file
+    api.dataset_download_files(dataset, path=output_dir, unzip=False)
+    print(f"Dataset downloaded to: {output_dir}")
 
-def download_data(url, save_path):
-    print("Downloading dataset...")
-    response = requests.get(url, stream=True)
-    with open(save_path, 'wb') as file:
-        file.write(response.content)
-    print("Download complete.")
+def extract_specific_files(zip_file, required_files, extract_dir):
+    print(f"Extracting required files from {zip_file}")
+    try:
+        with zipfile.ZipFile(zip_file, 'r') as zf:
+            for file in required_files:
+                if file in zf.namelist():
+                    zf.extract(file, path=extract_dir)
+                    print(f"Extracted: {file}")
+                else:
+                    print(f"File not found in archive: {file}")
+    except zipfile.BadZipFile as e:
+        print(f"Error: The zip file is corrupted or invalid. {e}")
 
-def unzip_data(zip_path, extract_to):
-    print("Extracting data...")
-    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_to)
-    print("Extraction complete.")
+def download_weather_data(url, output_file):
+    print(f"Downloading weather data from {url}")
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        with open(output_file, "wb") as file:
+            file.write(response.content)
+        print(f"Weather data saved to {output_file}")
+    except Exception as e:
+        print(f"Error downloading weather data: {e}")
 
-def find_csv_file(data_dir):
-    for root, dirs, files in os.walk(data_dir):
-        for file in files:
-            if file.endswith('.csv'):
-                return os.path.join(root, file)
-    return None
+def merge_and_save_taxi_data(data_dir, required_files, conn):
+    print("Starting to merge taxi data files...")
+    taxi_data = pd.DataFrame()  
 
-def load_and_clean_data(csv_file):
-    print("Loading and cleaning data...")
-    df = pd.read_csv(csv_file)
-    df.dropna(inplace=True)
-    df.columns = df.columns.str.strip().str.lower().str.replace(' ', '_')
-    print("Data loaded and cleaned.")
-    return df
+    for file in required_files:
+        file_path = os.path.join(data_dir, file)
+        if os.path.exists(file_path):
+            print(f"Found file: {file}")  
+            try:
+                df = pd.read_csv(file_path, low_memory=False)
+                print(f"Loaded {file} with shape: {df.shape}") 
+                taxi_data = pd.concat([taxi_data, df], ignore_index=True)
+                print(f"After merging {file}, merged data shape: {taxi_data.shape}")  
+            except Exception as e:
+                print(f"Error processing file {file}: {e}")
+        else:
+            print(f"File not found: {file}")  
 
-def save_to_sqlite(df, db_path):
-    print("Saving data to SQLite database...")
-    conn = sqlite3.connect(db_path)
-    df.to_sql('cardio_data', conn, if_exists='replace', index=False)
-    conn.close()
-    print(f"Data saved to SQLite at {db_path}.")
+    
+    if not taxi_data.empty:
+        print("Saving merged taxi data to table 'taxi_data'")  
+        taxi_data.to_sql("taxi_data", conn, if_exists="replace", index=False)
+        print("Taxi data saved successfully.")  
+    else:
+        print("No data available to save to 'taxi_data'")  
+
+def save_weather_data(weather_file, conn):
+    """Save the weather data file as 'weather_data' table."""
+    if os.path.exists(weather_file):
+        print(f"Processing weather data: {weather_file}")
+        try:
+            # Load the weather data
+            df = pd.read_csv(weather_file, low_memory=False)
+            print(f"Loaded weather data with shape: {df.shape}")  
+            
+            # Save to SQLite
+            table_name = "weather_data"
+            df.to_sql(table_name, conn, if_exists="replace", index=False)
+            print(f"Weather data saved to table {table_name}")
+        except Exception as e:
+            print(f"Error processing weather data: {e}")
+    else:
+        print(f"Weather data file not found: {weather_file}")
 
 def main():
-    download_data(DATA_URL, ZIP_FILE_PATH)
-    unzip_data(ZIP_FILE_PATH, DATA_DIR)
-    csv_file_path = find_csv_file(DATA_DIR)
-    if not csv_file_path:
-        print("No CSV file found in the extracted data.")
-        return
+    download_kaggle_dataset(KAGGLE_DATASET, DATA_DIR)
 
-    df = load_and_clean_data(csv_file_path)
-    save_to_sqlite(df, DB_PATH)
-    os.remove(ZIP_FILE_PATH)
+    zip_file_path = os.path.join(DATA_DIR, "newyork-yellow-taxi-trip-data-2020-2019.zip")
+    extract_specific_files(zip_file_path, REQUIRED_FILES, DATA_DIR)
 
-if __name__ == '__main__':
+    download_weather_data(WEATHER_DATA_URL, WEATHER_FILE)
+
+    conn = sqlite3.connect(DB_FILE)
+    merge_and_save_taxi_data(DATA_DIR, REQUIRED_FILES, conn)
+
+    save_weather_data(WEATHER_FILE, conn)
+    
+    conn.close()
+    print(f"All data saved to SQLite database at {DB_FILE}")
+
+if __name__ == "__main__":
     main()
