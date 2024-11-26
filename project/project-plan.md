@@ -13,11 +13,11 @@ This project aims to analyze the impact of various weather conditions (such as t
 ### Datasource 1: NYC Yellow Taxi Data
 * URL: https://www.kaggle.com/datasets/microize/newyork-yellow-taxi-trip-data-2020-2019
 * Data link: https://www.kaggle.com/datasets/microize/newyork-yellow-taxi-trip-data-2020-2019?select=yellow_tripdata_2020-01.csv
-* Data Type: CSV (Multiple files containing taxi ride data from January to June 2020).
+* Data Type: CSV (Multiple files containing taxi ride data 2019).
 
 ### Datasource 2: NYC Weather Data
-* URL: https:https://www.visualcrossing.com/weather-history/New%20York/metric/2020-01-01/2020-06-30
-* Data link: https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/retrievebulkdataset?&key=EWKX6KNV5Q2BQAP4XU4KATLT8&taskId=6121779de1626d8757e8255faf6e524e&zip=false
+* URL: https://www.visualcrossing.com/weather/weather-data-services/New%20York/metric/2019-01-01/2019-12-31
+* Data link: https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/retrievebulkdataset?&key=EWKX6KNV5Q2BQAP4XU4KATLT8&taskId=ac3d670f558e7e7a7ec766dcbf2b5711&zip=false
 * Data Type: CSV (Weather conditions for NYC during the same period).
 
   
