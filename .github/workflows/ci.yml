@@ -1,0 +1,48 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main  # Runs CI on every push to the 'main' branch
+  pull_request:
+    branches:
+      - main  # Runs CI on pull requests targeting the 'main' branch
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest  # Runs on a Linux environment
+
+    steps:
+    # Step 1: Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    # Step 2: Set up Python
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'  # Specify the Python version
+
+    # Step 3: Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas matplotlib seaborn  # Add other Python libraries your project requires
+
+    # Step 4: Make the tests.sh script executable
+    - name: Make tests.sh executable
+      run: chmod +x ./tests.sh
+
+    # Step 5: Run the tests
+    - name: Run tests
+      run: ./test.sh
+
+    # Optional Step 6: Cache dependencies to speed up CI runs
+    - name: Cache Python dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
