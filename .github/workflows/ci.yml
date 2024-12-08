@@ -1,52 +1,42 @@
-name: Continuous Integration
+name: Run Tests
 
 on:
   push:
     branches:
-      - main  # Run CI on every push to the main branch
+      - main  # Trigger workflow on push to the main branch
   pull_request:
     branches:
-      - main  # Run CI on pull requests targeting the main branch
+      - main  # Trigger workflow on pull request to the main branch
 
 jobs:
   test:
-    name: Run Tests
-    runs-on: ubuntu-latest  # Use an Ubuntu environment for the CI job
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code
-      - name: Checkout code
-        uses: actions/checkout@v3
+    # Step 1: Check out the repository code
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      # Step 2: Set up Python environment
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'  # Specify the Python version
+    # Step 2: Set up Python environment
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'  # You can specify your Python version here
 
-      # Step 3: Install SQLite3 (required for database checks)
-      - name: Install SQLite3
-        run: sudo apt-get install -y sqlite3
+    # Step 3: Install SQLite3
+    - name: Install SQLite3
+      run: sudo apt-get install sqlite3
 
-      # Step 4: Install dependencies
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install pandas matplotlib seaborn  # Add any other required Python libraries
+    # Step 4: Install dependencies
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      # Step 5: Make the test.sh script executable
-      - name: Make test.sh executable
-        run: chmod +x ./test.sh
+    # Step 5: Make test.sh executable
+    - name: Make test.sh executable
+      run: chmod +x ./test.sh  # Ensure the correct path to your script
 
-      # Step 6: Run the tests
-      - name: Run tests
-        run: ./test.sh
-
-      # Optional Step: Cache dependencies to speed up future CI runs
-      - name: Cache Python dependencies
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
+    # Step 6: Run the tests
+    - name: Run tests
+      run: ./test.sh
