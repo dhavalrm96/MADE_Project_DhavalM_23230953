@@ -27,7 +27,7 @@ jobs:
         pip install pandas numpy matplotlib seaborn kaggle
 
     - name: Make test.sh executable
-      run: chmod +x ./test.sh
+      run: chmod +x ./project/test.sh
 
     - name: Run tests
-      run: ./test.sh
+      run: ./project/test.sh
