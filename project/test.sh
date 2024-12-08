@@ -3,6 +3,9 @@
 # Stop the script if any command fails
 set -e
 
+# Change to the project directory
+cd "$(dirname "$0")"
+
 # File paths
 DATA_DIR="C:/Users/mulan/OneDrive/Desktop/MADE/MADE_Project_DhavalM_23230953/data"
 DB_FILE="${DATA_DIR}/data.db"
