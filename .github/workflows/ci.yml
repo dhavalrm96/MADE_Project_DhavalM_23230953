@@ -29,7 +29,7 @@ jobs:
     - name: Set up Kaggle API credentials
       run: |
         mkdir -p ~/.config/kaggle
-        echo "${{ secrets.KAGGLE_JSON }}" > ~/.config/kaggle/kaggle.json
+        echo "{\"username\":\"dhavalmulani\",\"key\":\"071cf689d9832b1fa34ebbdb48022293\"}" > ~/.config/kaggle/kaggle.json
         chmod 600 ~/.config/kaggle/kaggle.json
 
     - name: Make test.sh executable
