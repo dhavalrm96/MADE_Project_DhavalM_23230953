@@ -26,6 +26,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas numpy matplotlib seaborn kaggle
 
+    - name: Set up Kaggle API credentials
+      run: |
+        mkdir -p ~/.config/kaggle
+        echo "${{ secrets.KAGGLE_JSON }}" > ~/.config/kaggle/kaggle.json
+        chmod 600 ~/.config/kaggle/kaggle.json
+
     - name: Make test.sh executable
       run: chmod +x ./project/test.sh
 
