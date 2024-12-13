@@ -1,69 +1,77 @@
-pipeline Stops{
+pipeline Stops {
 
-        GTFSExtractor
-        ->GTFSArchiveInterpreter
-        ->GTFSFilePicker
-        ->GTFSTextFileInterpreter
-        ->GTFSCSVInterpreter
-        ->GTFSTableInterpreter
-        ->GTFSDataLoader;
+    GTFSExtractor
+    ->GTFSArchiveInterpreter
+    ->GTFSFilePicker
+    ->GTFSTextFileInterpreter
+    ->GTFSCSVInterpreter
+    ->GTFSTableInterpreter
+    ->GTFSDataLoader;
 
     block GTFSExtractor oftype HttpExtractor {
         url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
-
     }
 
     block GTFSArchiveInterpreter oftype ArchiveInterpreter {
         archiveType: "zip";
     }
-    block GTFSFilePicker oftype FilePicker{
+
+    block GTFSFilePicker oftype FilePicker {
         path: "/stops.txt";
     }
-    block GTFSTextFileInterpreter oftype TextFileInterpreter{
+
+    block GTFSTextFileInterpreter oftype TextFileInterpreter {
         encoding: "utf8";
     }
-    block GTFSCSVInterpreter oftype CSVInterpreter{
+
+    block GTFSCSVInterpreter oftype CSVInterpreter {
         delimiter: ",";
         enclosing: '"';
     }
-    block GTFSTableInterpreter oftype TableInterpreter{
-        header : true;
-        columns : [
+
+    block GTFSTableInterpreter oftype TableInterpreter {
+        header: true;
+        columns: [
             "stop_id" oftype integer,
-            "stop_name" oftype text,
-            "stop_lat" oftype RangeLimit,
-            "stop_lon" oftype RangeLimit,
-            "zone_id" oftype ConstraintZoneId
+            "stop_name" oftype TextWithUmlauts,
+            "stop_lat" oftype GeoCoordinate,
+            "stop_lon" oftype GeoCoordinate,
+            "zone_id" oftype ZoneIdConstraint
         ];
     }
 
-    valuetype ConstraintZoneId oftype integer{
-        constraints:[
-            Filtered
-        ];
+    valuetype ZoneIdConstraint oftype integer {
+        constraints: [ZoneFilter];
     }
-    constraint Filtered oftype RangeConstraint{
+
+    constraint ZoneFilter oftype RangeConstraint {
         lowerBound: 1925;
         lowerBoundInclusive: true;
         upperBound: 1925;
         upperBoundInclusive: true;
     }
 
-    valuetype RangeLimit oftype decimal {
-		constraints: [ 
-            SetRange 
-            ];
-	}
-	constraint SetRange oftype RangeConstraint {
-		lowerBound: 0;
-        lowerBoundInclusive: true;
-        upperBound: 90;
-        upperBoundInclusive : true;
-	}
-
-    block GTFSDataLoader oftype SQLiteLoader{
-        table : "stops";
-        file : "./gtfs.sqlite";
+    valuetype GeoCoordinate oftype decimal {
+        constraints: [CoordinateRange];
     }
 
+    constraint CoordinateRange oftype RangeConstraint {
+        lowerBound: -90;
+        lowerBoundInclusive: true;
+        upperBound: 90;
+        upperBoundInclusive: true;
+    }
+
+    valuetype TextWithUmlauts oftype text {
+        constraints: [PreserveUmlauts];
+    }
+
+    constraint PreserveUmlauts oftype RegexConstraint {
+        pattern: "^[\u00C0-\u017F\w\s\-\.,]+$";  // Allows German umlauts and common text characters
+    }
+
+    block GTFSDataLoader oftype SQLiteLoader {
+        table: "stops";
+        file: "./gtfs.sqlite";
+    }
 }
