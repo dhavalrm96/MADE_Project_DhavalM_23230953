@@ -1,62 +1,69 @@
-pipeline GFTSPipeline {
+pipeline Stops{
 
-    ZipExtractor
-    -> ZipArchiveInterpreter
-    -> GFTSFilePicker
-    -> GFTSTextInterpreter
-    -> GFTSCsvInterpreter
-    -> GFTSTableInterpreter
-    -> GFTSLoader;
+        GTFSExtractor
+        ->GTFSArchiveInterpreter
+        ->GTFSFilePicker
+        ->GTFSTextFileInterpreter
+        ->GTFSCSVInterpreter
+        ->GTFSTableInterpreter
+        ->GTFSDataLoader;
 
-    block ZipExtractor oftype HttpExtractor {
+    block GTFSExtractor oftype HttpExtractor {
         url: "https://gtfs.rhoenenergie-bus.de/GTFS.zip";
+
     }
 
-    block ZipArchiveInterpreter oftype ArchiveInterpreter {
+    block GTFSArchiveInterpreter oftype ArchiveInterpreter {
         archiveType: "zip";
     }
-
-    block GFTSFilePicker oftype FilePicker {
+    block GTFSFilePicker oftype FilePicker{
         path: "/stops.txt";
     }
-
-    block GFTSTextInterpreter oftype TextFileInterpreter {
-        encoding: 'utf8';
+    block GTFSTextFileInterpreter oftype TextFileInterpreter{
+        encoding: "utf8";
     }
-
-    block GFTSCsvInterpreter oftype CSVInterpreter {
+    block GTFSCSVInterpreter oftype CSVInterpreter{
+        delimiter: ",";
         enclosing: '"';
     }
-
-    block GFTSTableInterpreter oftype TableInterpreter {
-        header: true;
-        columns: [
+    block GTFSTableInterpreter oftype TableInterpreter{
+        header : true;
+        columns : [
             "stop_id" oftype integer,
-            "stop_name" oftype text, 
-            "stop_lat" oftype ValidCoordinate, 
-            "stop_lon" oftype ValidCoordinate, 
-            "zone_id" oftype ZoneID,
+            "stop_name" oftype text,
+            "stop_lat" oftype RangeLimit,
+            "stop_lon" oftype RangeLimit,
+            "zone_id" oftype ConstraintZoneId
         ];
     }
 
-    block GFTSLoader oftype SQLiteLoader {
-        table: 'stops';
-        file: './gtfs.sqlite';
+    valuetype ConstraintZoneId oftype integer{
+        constraints:[
+            Filtered
+        ];
+    }
+    constraint Filtered oftype RangeConstraint{
+        lowerBound: 1645;
+        lowerBoundInclusive: true;
+        upperBound: 1645;
+        upperBoundInclusive: true;
     }
 
-    valuetype ZoneID oftype integer{
-        constraints: [ZoneConstraint];
-    }
-
-    constraint ZoneConstraint on integer:
-        value == 1645;
-
-    valuetype ValidCoordinate oftype decimal {
-        constraints: [CoordinateConstraint];
-    }
-
-    constraint CoordinateConstraint oftype RangeConstraint {
-        lowerBound: -90;
+    valuetype RangeLimit oftype decimal {
+		constraints: [ 
+            SetRange 
+            ];
+	}
+	constraint SetRange oftype RangeConstraint {
+		lowerBound: 0;
+        lowerBoundInclusive: true;
         upperBound: 90;
+        upperBoundInclusive : true;
+	}
+
+    block GTFSDataLoader oftype SQLiteLoader{
+        table : "stops";
+        file : "./gtfs.sqlite";
     }
+
 }
