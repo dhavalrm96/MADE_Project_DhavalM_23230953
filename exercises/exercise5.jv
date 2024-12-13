@@ -33,7 +33,7 @@ pipeline Stops {
         header: true;
         columns: [
             "stop_id" oftype integer,
-            "stop_name" oftype TextWithUmlauts,
+            "stop_name" oftype text,
             "stop_lat" oftype GeoCoordinate,
             "stop_lon" oftype GeoCoordinate,
             "zone_id" oftype ZoneIdConstraint
@@ -61,15 +61,7 @@ pipeline Stops {
         upperBound: 90;
         upperBoundInclusive: true;
     }
-
-    valuetype TextWithUmlauts oftype text {
-        constraints: [PreserveUmlauts];
-    }
-
-    constraint PreserveUmlauts oftype RegexConstraint {
-        pattern: "^[\u00C0-\u017F\w\s\-\.,]+$";  // Allows German umlauts and common text characters
-    }
-
+    
     block GTFSDataLoader oftype SQLiteLoader {
         table: "stops";
         file: "./gtfs.sqlite";
