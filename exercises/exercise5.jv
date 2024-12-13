@@ -43,9 +43,9 @@ pipeline Stops{
         ];
     }
     constraint Filtered oftype RangeConstraint{
-        lowerBound: 1645;
+        lowerBound: 1925;
         lowerBoundInclusive: true;
-        upperBound: 1645;
+        upperBound: 1925;
         upperBoundInclusive: true;
     }
 
