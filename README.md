@@ -1,6 +1,6 @@
 # Methods of Advanced Data Engineering Project
 
-## Project Overview: Taxi & Weather Insights
+## Project Overview: Taxi & Weather Insights: Understanding Taxi Demand Trends and Weather Impact
 
 This project examines the relationship between weather conditions and taxi demand in New York City. It integrates data from two open datasets to explore how factors like temperature, humidity, wind speed, and visibility affect taxi usage patterns.
 
@@ -20,4 +20,3 @@ This project examines the relationship between weather conditions and taxi deman
 ### License:
 This project is licensed under the [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE).
 
----
